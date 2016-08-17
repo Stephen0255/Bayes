@@ -16,15 +16,15 @@ y(1)=measurements.y_initial;
 
 if strcmp(model,'first_order_homogenous') % y' +ay = 0
     a = parameters(1);
-    if strcmp(scheme,'upwind')
+    if scheme == 1 % Upwind
         for k=2:N
             y(k)=(1-a*delta)*y(k-1);
         end
-    elseif strcmp(scheme,'downwind')
+    elseif scheme == -1 % Downwind
         for k=2:N
             y(k)=y(k-1)/(1+a*delta);
         end
-    elseif strcmp(scheme,'center')
+    elseif scheme == 0 % Center
         for k=2:N
             y(k)=y(k-1)*((1-a*delta)+1/(1+a*delta))/2; % 1/2 upwind + 1/2 downwind
         end
@@ -33,15 +33,15 @@ if strcmp(model,'first_order_homogenous') % y' +ay = 0
 elseif strcmp(model,'first_order') % y' +ay + b = 0
     a = parameters(1);
     b = parameters(2);
-    if strcmp(scheme,'upwind')
+    if scheme == 1 % Upwind
         for k=2:N
             y(k)=(1-a*delta)*y(k-1)-b*delta;
         end
-    elseif strcmp(scheme,'downwind')
+    elseif scheme == -1 % Downwind
         for k=2:N
             y(k)=(y(k-1)-b*delta)/(1+a*delta);
         end
-    elseif strcmp(scheme,'center')
+    elseif scheme == 0 % Center
         for k=2:N
             y(k)=((1-a*delta)*y(k-1)-b*delta+(y(k-1)-b*delta)/(1+a*delta))/2; % 1/2 upwind + 1/2 downwind
         end
