@@ -1,33 +1,30 @@
-% Simule les données pour y' + ay + b = 0
+clear all
 
-a=1;
-b=2;
-measurements.y_initial = 1;
-measurements.delta=0.1;
-t= 0:measurements.delta:1;
-y=(measurements.y_initial+b/a)*exp(-a*t)-b/a;
-plot(t,y)
+% Simulate the data
 
-% Rajouter une perturbation gaussienne
+model_experiment.type = 'first_order_homogenous'; % first_order_homogenous, first_order, second order, Navier-Stokes
+model_experiment.coefficients = [1, 2]; % 1, 2, 3, ... coefficients
+coefficients=[1, 0.1, 0, 1, 2]; %  [y_initial, delta_t, t(0), t(end)]
+noise.isnoise = true;
+noise.sigma_noise = 0.01;
 
-measurements.y=y;
-measurements.t=t;
-measurements.sigma=0.1;
-measurements.number = length(measurements.y);
 
-clearvars y t
+q=makedist('Normal','mu',0,'sigma',noise.sigma_noise); % distribution normale centrée en 0
 
-model='first_order'; % first_order_homogenous, first_order
-scheme='upwind'; % upwind, downwind, center, center_1/2
-N = 100; % nombres de d'échantillons
-M = 100; % nombre d'itérations pour la chaîne de Markov
-n = 2; % coefficient d'augmentation de la discrétisation en temps (pour être plus précis)
-delta = measurements.delta/n;
-sigma_algorithm=measurements.sigma;
+measurements = simulate_data(model_experiment, coefficients, noise, q); % measurements.y, measurements.t, measurements.number
+
+%
+
+
+model = 'first_order_homogenous';
+scheme='upwind'; % upwind, downwind, center
+N = 1000; % nombres de d'échantillons
+M = 1000; % nombre d'itérations pour la chaîne de Markov
+sigma_algorithm=noise.sigma_noise;
 
 if strcmp(model,'first_order_homogenous') % y' +ay = 0, un seul paramètre a
     p_a = makedist('Uniform','lower',0,'upper',2); % distribution uniforme (prior) pour a
-    parameters = cell(2,N); % première ligne: a, deuxième ligne, le poids de a: PI
+    parameters = zeros(2,N); % première ligne: a, deuxième ligne, le poids de a: PI
     
     for k=1:N
     parameters(1,k) = random(p_a); % initialisation de la valeur de a
@@ -57,7 +54,7 @@ end
 total_acceptance = 0;
 
 for i=1:M % à chaque itération, on fait :
-[ parameters, acceptance ] = markov_iteration( measurements, model, scheme, parameters, M, sigma_algorithm );
+[ parameters, acceptance ] = markov_iteration( measurements, model, scheme, parameters, M, sigma_algorithm, q );
 
 total_acceptance = total_acceptance + acceptance;
 calcul_effectue = i/M;

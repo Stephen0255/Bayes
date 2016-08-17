@@ -1,13 +1,10 @@
-function [ parameters, acceptance ] = markov_iteration( measurements, model, scheme, parameters, M, sigma_algorithm )
+function [ parameters, acceptance ] = markov_iteration( measurements, model, scheme, parameters, M, sigma_algorithm, q )
 % This function proceed to one iteration of the Metropolis-Hasting
 % algorithm
 %   The input arguments are the data (measurements), the model
 %   (first_order, second_order, Navier-Stokes), the scheme (upwind, center,
 %   ...) and the set of parameters.
 %   The outpout will be a new set of parameters
-
-q=makedist('Normal','mu',0,'sigma',measurements.sigma); % distribution normale centrée en 0
-
 
 N=length(parameters(1,:));
 
