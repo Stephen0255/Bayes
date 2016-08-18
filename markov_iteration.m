@@ -6,12 +6,11 @@ function [ parameters, compteur ] = markov_iteration( measurements, model, param
 %   ...) and the set of parameters.
 %   The outpout will be a new set of parameters
 
-if model_comparaison
-    scheme = parameters.scheme(k);
+if parameters.several_scheme % adapte la fonction pour traiter le cas où il y a plusieurs schémas
+    scheme = parameters.scheme(iteration);
 else
-    scheme = parameters.scheme;
+    scheme =parameters.scheme;
 end
-
     
     if strcmp(model,'first_order_homogenous')
         

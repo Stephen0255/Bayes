@@ -16,8 +16,8 @@ measurements = simulate_data(model_experiment, coefficients, noise, q_experiment
 plot(measurements.t,measurements.y)
 %% Computation of the model
 
-model_comparaison = false;
 model = 'first_order_homogenous';
+parameter.several_scheme = false;
 lower_a = 0; % borne inférieure pour la prior uniforme sur a
 upper_a = 2; % borne supérieure
 lower_b = 0; % idem pour b
@@ -33,8 +33,8 @@ elseif strcmp(model,'first_order')
     p_b = makedist('Uniform','lower',lower_b,'upper',upper_b); % distribution uniforme (prior) pour b
 end
 
-N = 250; % nombres de d'échantillons
-M = 250; % nombre d'itérations pour la chaîne de Markov
+N = 500; % nombres de d'échantillons
+M = 1000; % nombre d'itérations pour la chaîne de Markov
 sigma_algorithm=0.1;
 q_algorithm=makedist('Normal','mu',0,'sigma',sigma_algorithm); % distribution normale centrée en 0
 
