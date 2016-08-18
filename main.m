@@ -17,7 +17,7 @@ plot(measurements.t,measurements.y)
 %% Computation of the model
 
 model = 'first_order_homogenous';
-parameter.several_scheme = false;
+parameters.several_scheme = false;
 lower_a = 0; % borne inférieure pour la prior uniforme sur a
 upper_a = 2; % borne supérieure
 lower_b = 0; % idem pour b
