@@ -18,47 +18,21 @@ plot(measurements.t,measurements.y)
 
 
 model = 'first_order_homogenous';
-lower_a = 0; % borne inférieure pour la prior uniforme sur a
-upper_a = 2; % borne supérieure
-lower_b = 0; % idem pour b
-upper_b = 4;
+prior.lower_a = 0; % borne inférieure pour la prior uniforme sur a
+prior.upper_a = 2; % borne supérieure
+prior.lower_b = 0; % idem pour b
+prior.upper_b = 4;
 
 
-if strcmp(model,'first_order_homogenous')
-    number_coefficients = 1;
-    p_a = makedist('Uniform','lower',lower_a,'upper',upper_a); % distribution uniforme (prior) pour a
-elseif strcmp(model,'first_order')
-    number_coefficients = 2;
-    p_a = makedist('Uniform','lower',lower_a,'upper',upper_a); % distribution uniforme (prior) pour a
-    p_b = makedist('Uniform','lower',lower_b,'upper',upper_b); % distribution uniforme (prior) pour b
-end
-
-N = 1000; % nombres de d'échantillons
-M = 10000; % nombre d'itérations pour la chaîne de Markov
+number_samples = 100; % nombres de d'échantillons
+M = 100; % nombre d'itérations pour la chaîne de Markov
 sigma_algorithm=0.1;
 q_algorithm=makedist('Normal','mu',0,'sigma',sigma_algorithm); % distribution normale centrée en 0
 
-parameters.scheme = randi([-1 1],1,N); % upwind 1, downwind -1, center 0
-parameters.several_scheme = true;
-parameters.coefficients = zeros(number_coefficients,N); % premiere ligne: a, deuxieme: b, ...
-parameters.poids = zeros(1,N);
+scheme = randi([-1 1],1,number_samples); % upwind 1, downwind -1, center 0
+several_scheme = true;
 
-for k=1:N % initialisation des valeurs
-    
-    if strcmp(model,'first_order_homogenous') % y' +ay = 0, un seul paramètre a
-        parameters.coefficients(1,k) = random(p_a); % initialisation de la valeur de a
-        y_calc=calcul_position(measurements,model,parameters.scheme(k), [parameters.coefficients(1,k)]); % calcul la position de tous les points
-        
-    elseif strcmp(model,'first_order') % y' + ay + b = 0, deux paramètres a et b
-        parameters.coefficients(1,k) = random(p_a); % initialisation de la valeur de a
-        parameters.coefficients(2,k) = random(p_b); % initialisation de la valeur de b
-        y_calc=calcul_position(measurements,model,parameters.scheme(k),[parameters.coefficients(1,k) parameters.coefficients(2,k)]); % calcul la position de tous les points
-        
-    end
-    somme_carree = sum((measurements.y-y_calc).^2); % calcul la somme des carrés des erreurs
-    parameters.poids(k)=1/(sigma_algorithm^(measurements.number))*exp(-1/(2*sigma_algorithm^2)*somme_carree); % donne la valeur de PI pour la a correspondant  
-
-end
+[ parameters ] = initialization_MCMC( measurements, model, scheme, prior, number_samples, sigma_algorithm, several_scheme);
 
 % initialisation
 center = find(~parameters.scheme); % indices correspondant au schéma centré
