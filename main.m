@@ -21,24 +21,52 @@ number_samples = 50; % nombres de d'échantillons
 number_iteration = 100; % nombre d'itérations pour la chaîne de Markov
 sigma_algorithm=0.1;
 
-scheme_comparaison = true; 
-
-if scheme_comparaison
-    scheme = randi([-1 1],1,number_samples); % upwind 1, downwind -1, center 0
-    several_scheme = true;
-else
-    scheme = 1; % upwind 1, downwind -1, center 0
-    several_scheme = false;
-end
+scheme_comparaison = true;
+choosen_scheme = 'Upwind'; % Upwind, Center or Downwind
 
 prior.lower_a = 0; % borne inférieure pour la prior uniforme sur a
 prior.upper_a = 2; % borne supérieure
 prior.lower_b = 0; % idem pour b
 prior.upper_b = 4;
 
-[ parameters ] = initialization_MCMC( measurements, model, scheme, prior, number_samples, sigma_algorithm, several_scheme);
+if  ~scheme_comparaison
+    if strcmp(choosen_scheme,'Upwind')
+        scheme = 1; % upwind 1, downwind -1, center 0
+    elseif strcmp(choosen_scheme,'Center')
+        scheme = 0;
+    elseif strcmp(choosen_scheme,'Downwind')
+        scheme = -1;
+    end
+    several_scheme = false;
+    
+    [ parameters ] = initialization_MCMC( measurements, model, scheme, prior, number_samples, sigma_algorithm, several_scheme);
+    [ parameters ] = MCMC( measurements, model, parameters, sigma_algorithm, several_scheme, number_iteration );
+    create_histogram( model, parameters, several_scheme, noise.sigma )
+    
+else
+    several_scheme = false;
+    scheme = 1;
+    [ parameters_upwind ] = initialization_MCMC( measurements, model, scheme, prior, number_samples, sigma_algorithm, several_scheme);
+    [ parameters_upwind ] = MCMC( measurements, model, parameters_upwind, sigma_algorithm, several_scheme, number_iteration );
+    
+    scheme = 0;
+    [ parameters_center ] = initialization_MCMC( measurements, model, scheme, prior, number_samples, sigma_algorithm, several_scheme);
+    [ parameters_center ] = MCMC( measurements, model, parameters_center, sigma_algorithm, several_scheme, number_iteration );
+    
+    scheme = -1;
+    [ parameters_downwind ] = initialization_MCMC( measurements, model, scheme, prior, number_samples, sigma_algorithm, several_scheme);
+    [ parameters_downwind ] = MCMC( measurements, model, parameters_downwind, sigma_algorithm, several_scheme, number_iteration );
+    
+    several_scheme = true;
+    parameters.several_scheme = several_scheme;
+    parameters.coefficients = [parameters_upwind.coefficients, parameters_center.coefficients, parameters_downwind.coefficients];
+    parameters.poids = [parameters_upwind.poids, parameters_center.poids, parameters_downwind.poids];
+    parameters.scheme = [ones(1,number_samples), zeros(1,number_samples), -1*ones(1,number_samples)];
+    [ parameters ] = MCMC( measurements, model, parameters, sigma_algorithm, several_scheme, number_iteration );
+end
 
-[ parameters ] = MCMC( measurements, model, parameters, sigma_algorithm, several_scheme, number_iteration );
 
 create_histogram( model, parameters, several_scheme, noise.sigma )
+
+
 

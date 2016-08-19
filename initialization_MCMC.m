@@ -1,7 +1,7 @@
 function [ parameters ] = initialization_MCMC( measurements, model, scheme, prior, number_samples, sigma_algorithm, several_scheme)
 % Initialise les paramètres de l'algorithme de Métropolis-Hasting
 %   Outpout : la valeur des coefficients pour le début de la chaîne de
-%   Markov et le poids (tout est regroupé sous parameters
+%   Markov et le poids (tout est regroupé sous parameters)
 %   Inpout : les données expérimentales, le modèle ainsi que le schéma à utiliser. La prior sur les
 %   coefficients du modèle ainsi que le sigma de l'algorithme
 

@@ -1,4 +1,4 @@
-function [ parameters, compteur ] = markov_iteration( measurements, model, parameters, M, sigma_algorithm, q, iteration, compteur )
+function [ parameters, compteur ] = markov_iteration( measurements, model, parameters, sigma_algorithm, q, iteration, compteur )
 % This function proceed to one iteration of the Metropolis-Hasting
 % algorithm
 %   The input arguments are the data (measurements), the model

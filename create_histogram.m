@@ -37,7 +37,7 @@ if several_scheme
     
         figure()
         histogram(a_upwind,'BinWidth', BinWidth)
-        title(parameters.scheme);
+        title('Upwind');
         xlabel('a');
         
         figure()
@@ -68,21 +68,29 @@ if several_scheme
     
 elseif ~several_scheme
 
+    if parameters.scheme == 1
+        str = 'Upwind';
+    elseif parameters.scheme == 0
+        str = 'Center';
+    elseif  parameters.scheme == -1
+        str = 'Downwind';
+    end
+    
     if strcmp(model,'first_order_homogenous')
         figure()
         histogram(parameters.coefficients(1,:),'BinWidth', BinWidth)
-        title(parameters.scheme);
+        title(str);
         xlabel('a');
         
     elseif strcmp(model,'first_order')
         figure()
         histogram(parameters.coefficients(1,:),'BinWidth', BinWidth)
-        title(parameters.scheme);
+        title(str);
         xlabel('a');
         
         figure()
         histogram(parameters.coefficients(2,:),'BinWidth', BinWidth)
-        title(parameters.scheme);
+        title(str);
         xlabel('b');
     end
 end
