@@ -22,37 +22,16 @@ prior.upper_a = 2; % borne supérieure
 prior.lower_b = 0; % idem pour b
 prior.upper_b = 4;
 
-
 number_samples = 50; % nombres de d'échantillons
-M = 100; % nombre d'itérations pour la chaîne de Markov
+number_iteration = 100; % nombre d'itérations pour la chaîne de Markov
 sigma_algorithm=0.1;
-q_algorithm=makedist('Normal','mu',0,'sigma',sigma_algorithm); % distribution normale centrée en 0
 
 scheme = 1; % upwind 1, downwind -1, center 0
 several_scheme = false;
 
 [ parameters ] = initialization_MCMC( measurements, model, scheme, prior, number_samples, sigma_algorithm, several_scheme);
 
-total_acceptance = 0;
-
-for i=1:M % à chaque itération, on fait :
-    N=length(parameters.coefficients(1,:));
-
-    compteur = 0;
-    
-    for k=1:N % pour chaque échantillon, on fait :
-    [ parameters, compteur ] = markov_iteration( measurements, model, parameters, M, sigma_algorithm, q_algorithm, k, compteur );
-    end
-    
-    acceptance=compteur/N;
-    total_acceptance = total_acceptance + acceptance;
-    calcul_effectue = i/M;
-    avancement = strcat({'Avancement: '}, {num2str(100*calcul_effectue)}, {'%'});
-    display(avancement);
-end
-
-acceptance_ratio = strcat({'Acceptance ratio: '},{num2str(100*total_acceptance/M)},{'%'});
-display(acceptance_ratio);
+[ parameters ] = MCMC( measurements, model, parameters, sigma_algorithm, several_scheme, number_iteration );
 
 
 
